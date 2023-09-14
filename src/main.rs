@@ -1,30 +1,32 @@
-mod utils;
 mod binds;
+mod utils;
+
+use binds::*;
+use utils::*;
 
 use std::convert::Infallible;
 use std::env;
-use std::net::SocketAddr;
 use tokio::net::TcpListener;
-use anyhow::{Result, anyhow};
-use hyper::{Request, Response};
-use hyper::body::Bytes;
-use hyper::header::CONTENT_TYPE;
-use hyper::http::HeaderValue;
-use hyper::server::conn::http1;
-use hyper::service::service_fn;
-use http_body_util::Full;
 use hyper_util::rt::TokioIo;
-use binds::*;
-use utils::*;
+use http_body_util::Full;
+use hyper::{
+    body::Bytes,
+    header::CONTENT_TYPE,
+    http::HeaderValue,
+    server::conn::http1,
+    service::service_fn,
+    Request,
+    Response,
+};
 
 
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let listener = TcpListener::bind(
-        get_bind_address(&args).unwrap()
-    ).await.unwrap();
+    let listener = TcpListener::bind(get_bind_address(&args).unwrap())
+        .await
+        .unwrap();
 
     while let Ok((stream, _)) = listener.accept().await {
         tokio::spawn(async move {
@@ -42,11 +44,13 @@ async fn main() {
 ///
 /// Currently all requests will result in the same page,
 /// so there is no need to implement additional functionality
-async fn hub(_: Request<hyper::body::Incoming>) -> std::result::Result<Response<Full<Bytes>>, Infallible> {
+async fn hub(
+    _: Request<hyper::body::Incoming>,
+) -> Result<Response<Full<Bytes>>, Infallible> {
     let response = Response::builder()
         .header(CONTENT_TYPE, HeaderValue::from_static("text/html"))
         .body::<Full<Bytes>>(Bytes::from(HTML_PAGE).into())
-        .unwrap();  // Will never produce an error.
+        .unwrap(); // Will never produce an error.
 
     Ok(response)
 }
