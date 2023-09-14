@@ -38,6 +38,10 @@ async fn main() {
     }
 }
 
+/// Handles each request.
+///
+/// Currently all requests will result in the same page,
+/// so there is no need to implement additional functionality
 async fn hub(_: Request<hyper::body::Incoming>) -> std::result::Result<Response<Full<Bytes>>, Infallible> {
     let response = Response::builder()
         .header(CONTENT_TYPE, HeaderValue::from_static("text/html"))
