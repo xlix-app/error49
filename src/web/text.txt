@@ -1,0 +1,4 @@
+If you see this message, it means we are currently experiencing a
+technical break. This could be due to the implementation of a new
+update or critical issues with our infrastructure. We apologize
+for any inconvenience.

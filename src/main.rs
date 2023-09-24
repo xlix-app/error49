@@ -24,6 +24,8 @@ use hyper::{
 async fn main() {
     let args: Vec<String> = env::args().collect();
 
+    init_html_page(&args);
+
     let listener = TcpListener::bind(get_bind_address(&args).unwrap())
         .await
         .unwrap();
@@ -47,9 +49,14 @@ async fn main() {
 async fn hub(
     _: Request<hyper::body::Incoming>,
 ) -> Result<Response<Full<Bytes>>, Infallible> {
+    let body = HTML_PAGE
+        .get()
+        .map(|page| page.as_str())
+        .unwrap_or("HTML page was not initialized!");
+
     let response = Response::builder()
         .header(CONTENT_TYPE, HeaderValue::from_static("text/html"))
-        .body::<Full<Bytes>>(Bytes::from(HTML_PAGE).into())
+        .body::<Full<Bytes>>(Bytes::from(body).into())
         .unwrap(); // Will never produce an error.
 
     Ok(response)
